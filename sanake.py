@@ -11,7 +11,8 @@ class SnakeGame:
         self.white = (255, 255, 255)
         self.black = (0, 0, 0)
         self.red = (255, 0, 0)
-        self.green = (0, 255, 0)  # New color for snake
+        self.green = (108, 187, 60)
+        
 
         # Window settings
         self.window_width = 800
@@ -30,7 +31,7 @@ class SnakeGame:
 
         # Game variables
         self.clock = pygame.time.Clock()
-        self.FPS = 10 # Increased FPS for faster apple displacement
+        self.FPS = 10
         self.blockSize = 20
         self.noPixel = 0
 
@@ -45,9 +46,6 @@ class SnakeGame:
         # Apple variables
         self.randomAppleX = round(random.randrange(0, self.window_width - self.blockSize) / 10.0) * 10.0
         self.randomAppleY = round(random.randrange(0, self.window_height - self.blockSize) / 10.0) * 10.0
-
-        # Timer variables
-        self.last_apple_move = pygame.time.get_ticks()  # Initialize timer
 
         # Start playing background music
         pygame.mixer.music.play(-1)  # -1 means loop indefinitely
@@ -65,7 +63,7 @@ class SnakeGame:
 
     def snake(self):
         for size in self.snakelist:
-            pygame.draw.rect(self.gameDisplay, self.green, [size[0] + 5, size[1], self.blockSize, self.blockSize])  # Use green color for snake
+            pygame.draw.rect(self.gameDisplay, self.green, [size[0] + 5, size[1], self.blockSize, self.blockSize])
 
     def message_to_screen(self, msg, color):
         screen_text = self.font.render(msg, True, color)
@@ -104,7 +102,7 @@ class SnakeGame:
         self.lead_x += self.change_pixels_of_x
         self.lead_y += self.change_pixels_of_y
 
-        self.gameDisplay.fill(self.black)  # Fill background with black color
+        self.gameDisplay.fill(self.black)
 
         AppleThickness = 20
 
@@ -125,11 +123,15 @@ class SnakeGame:
         self.snake()
         pygame.display.update()
 
-        current_time = pygame.time.get_ticks()
-        if current_time - self.last_apple_move > 2500:  # Move apple every 2.5 seconds
-            self.last_apple_move = current_time
-            self.randomAppleX = round(random.randrange(0, self.window_width - self.blockSize) / 10.0) * 10.0
-            self.randomAppleY = round(random.randrange(0, self.window_height - self.blockSize) / 10.0) * 10.0
+        if self.lead_x >= self.randomAppleX and self.lead_x <= self.randomAppleX + AppleThickness:
+            if self.lead_y >= self.randomAppleY and self.lead_y <= self.randomAppleY + AppleThickness:
+                # Play bite sound effect
+                self.bite_sound.play()
+
+                self.randomAppleX = round(random.randrange(0, self.window_width - self.blockSize) / 10.0) * 10.0
+                self.randomAppleY = round(random.randrange(0, self.window_height - self.blockSize) / 10.0) * 10.0
+
+                self.snakeLength += 1
 
     def game_loop(self):
         self.gameExit = False
@@ -137,8 +139,8 @@ class SnakeGame:
 
         while not self.gameExit:
             while self.gameOver:
-                self.gameDisplay.fill(self.green)
-                self.message_to_screen("Game over", self.red)
+                self.gameDisplay.fill(self.black)
+                self.message_to_screen("Game over", self.red )
                 pygame.display.update()
 
                 for event in pygame.event.get():
